@@ -20,6 +20,8 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<maven.compiler.target>21</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -27,6 +29,7 @@
 		<module>ewm-stats-common</module>
 		<module>ewm-stats-service</module>
 		<module>ewm-stats-client</module>
+		<module>ewm-main-service</module>
 	</modules>
 
 	<build>
