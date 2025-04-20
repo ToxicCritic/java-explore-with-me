@@ -9,7 +9,6 @@ import ru.practicum.explorewithme.stats.service.entity.EndpointHitEntity;
 import ru.practicum.explorewithme.stats.service.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @Service
