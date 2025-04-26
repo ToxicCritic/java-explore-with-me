@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.main.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,18 +15,17 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    /* ---------- PUBLIC ---------- */
     @Query("""
-           SELECT e
-           FROM Event e
-           WHERE e.state = 'PUBLISHED'
-             AND ( :text IS NULL OR
-                   ( LOWER(e.annotation) LIKE LOWER(CONCAT('%', :text, '%'))
-                     OR LOWER(e.description) LIKE LOWER(CONCAT('%', :text, '%')) ) )
-             AND ( :paid IS NULL OR e.paid = :paid )
-             AND ( :catIds IS NULL OR e.category.id IN :catIds )
-             AND e.eventDate BETWEEN :start AND :end
-           """)
+       SELECT e
+       FROM Event e
+       WHERE e.state = 'PUBLISHED'
+         AND ( :text IS NULL OR
+               LOWER(e.annotation)  LIKE :text OR
+               LOWER(e.description) LIKE :text )
+         AND ( :paid   IS NULL OR e.paid          = :paid   )
+         AND ( :catIds IS NULL OR e.category.id  IN :catIds )
+         AND e.eventDate BETWEEN :start AND :end
+       """)
     Page<Event> searchPublished(@Param("text") String text,
                                 @Param("catIds") List<Long> catIds,
                                 @Param("paid")   Boolean paid,
@@ -35,10 +35,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByIdAndState(Long id, EventState state);
 
-    /* ---------- PRIVATE (инициатор) ---------- */
+    boolean existsByCategoryId(Long categoryId);
+
     Page<Event> findAllByInitiatorId(Long userId, Pageable page);
 
-    /* ---------- ADMIN ---------- */
     @Query("""
            SELECT e
            FROM Event e

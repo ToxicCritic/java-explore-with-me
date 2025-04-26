@@ -1,6 +1,8 @@
 package ru.practicum.explorewithme.main.service;
 
+import ru.practicum.explorewithme.main.dto.EventRequestStatusUpdateResult;
 import ru.practicum.explorewithme.main.dto.ParticipationRequestDto;
+import ru.practicum.explorewithme.main.dto.UpdateEventRequestStatusRequest;
 
 import java.util.List;
 
@@ -12,6 +14,10 @@ public interface RequestService {
     ParticipationRequestDto cancel(Long userId, Long requestId);
 
     List<ParticipationRequestDto> findForEventOwner(Long userId, Long eventId);
+
+    EventRequestStatusUpdateResult updateStatus(Long userId,
+                                                Long eventId,
+                                                UpdateEventRequestStatusRequest body);
 
     ParticipationRequestDto confirm(Long userId, Long eventId, Long reqId);
 

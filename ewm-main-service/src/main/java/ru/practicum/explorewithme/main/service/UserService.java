@@ -9,6 +9,6 @@ public interface UserService {
     List<UserDto> find(List<Long> ids, int from, int size);
 
     UserDto add(NewUserRequest dto);
-    
+
     void delete(Long id);
 }
