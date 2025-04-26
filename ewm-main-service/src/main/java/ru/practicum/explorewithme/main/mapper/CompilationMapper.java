@@ -1,4 +1,3 @@
-// src/main/java/ru/practicum/explorewithme/main/mapper/CompilationMapper.java
 package ru.practicum.explorewithme.main.mapper;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ public class CompilationMapper {
     public Compilation fromDto(NewCompilationDto dto, List<Event> events) {
         return Compilation.builder()
                 .title(dto.getTitle())
-                .pinned(dto.getPinned())
+                .pinned(dto.getPinned() != null && dto.getPinned())
                 .events(events)
                 .build();
     }

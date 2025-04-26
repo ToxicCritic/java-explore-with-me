@@ -1,4 +1,3 @@
-// src/main/java/ru/practicum/explorewithme/main/mapper/EventMapper.java
 package ru.practicum.explorewithme.main.mapper;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ public class EventMapper {
     private final CategoryMapper categoryMapper;
     private final UserMapper      userMapper;
     private final LocationMapper  locationMapper;
+
     public EventShortDto toShortDto(Event e) {
         if (e == null) return null;
 
@@ -28,8 +28,8 @@ public class EventMapper {
                 .category(categoryMapper.toDto(e.getCategory()))
                 .paid(e.getPaid())
                 .eventDate(e.getEventDate())
-                .confirmedRequests(e.getConfirmedRequestsCount())
                 .views(e.getViews() == null ? 0 : e.getViews())
+                .initiator(userMapper.toDto(e.getInitiator()))
                 .build();
     }
 
@@ -50,7 +50,7 @@ public class EventMapper {
                 .location(locationMapper.toDto(e.getLocation()))
                 .participantLimit(e.getParticipantLimit())
                 .requestModeration(e.getRequestModeration())
-                .confirmedRequests(e.getConfirmedRequestsCount())
+                .state(e.getState())
                 .views(e.getViews() == null ? 0 : e.getViews())
                 .build();
     }
@@ -64,19 +64,26 @@ public class EventMapper {
     }
 
     public Event fromDto(NewEventDto dto) {
-        return Event.builder()
+
+        Event ev = Event.builder()
                 .title(dto.getTitle())
                 .annotation(dto.getAnnotation())
                 .description(dto.getDescription())
                 .paid(dto.getPaid())
                 .eventDate(dto.getEventDate())
                 .createdOn(LocalDateTime.now())
-                .participantLimit(
-                        dto.getParticipantLimit() == null ? 0 : dto.getParticipantLimit())
-                .requestModeration(dto.getRequestModeration())
+                .participantLimit(dto.getParticipantLimit())
+                .requestModeration(dto.getRequestModeration() == null || dto.getRequestModeration())
+
                 .state(EventState.PENDING)
                 .location(locationMapper.fromDto(dto.getLocation()))
                 .build();
+
+        if (ev.getPaid() == null)             ev.setPaid(false);
+        if (ev.getParticipantLimit() == null) ev.setParticipantLimit(0);
+        if (ev.getRequestModeration() == null)ev.setRequestModeration(true);
+
+        return ev;
     }
 
     public void apply(UpdateEventUserRequest dto, Event e) {

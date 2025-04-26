@@ -2,6 +2,7 @@ package ru.practicum.explorewithme.main.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.main.dto.CategoryDto;
+import ru.practicum.explorewithme.main.dto.NewCategoryDto;
 import ru.practicum.explorewithme.main.model.Category;
 
 @Component
@@ -16,10 +17,9 @@ public class CategoryMapper {
                 .build();
     }
 
-    public Category fromDto(CategoryDto dto) {
+    public Category fromDto(NewCategoryDto dto) {
         if (dto == null) return null;
         return Category.builder()
-                .id(dto.getId())
                 .name(dto.getName())
                 .build();
     }

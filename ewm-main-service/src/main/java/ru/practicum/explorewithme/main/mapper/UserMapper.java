@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.main.mapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.main.dto.NewUserRequest;
 import ru.practicum.explorewithme.main.dto.UserDto;
-import ru.practicum.explorewithme.main.dto.UserShortDto;
 import ru.practicum.explorewithme.main.model.User;
 
 @Component
