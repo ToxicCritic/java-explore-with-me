@@ -1,13 +1,16 @@
 package ru.practicum.explorewithme.main.exception;
 
+import jakarta.persistence.RollbackException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.*;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -62,10 +65,37 @@ public class ApiExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, ex, req, details);
     }
 
+    @ExceptionHandler(TransactionSystemException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleTransactionSystem(TransactionSystemException ex, HttpServletRequest req) {
+        Throwable cause = ex.getRootCause();
+        if (cause instanceof ConstraintViolationException cve) {
+            return handleConstraint(cve, req);
+        }
+        return handleAll(ex, req);
+    }
+
+    @ExceptionHandler(RollbackException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleRollback(RollbackException ex, HttpServletRequest req) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof ConstraintViolationException cve) {
+            return handleConstraint(cve, req);
+        }
+        return handleAll(ex, req);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest req) {
         return build(HttpStatus.BAD_REQUEST, ex, req, "Malformed JSON request");
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingParam(MissingServletRequestParameterException ex, HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST, ex, req, "Missing required parameter");
+
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
