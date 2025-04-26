@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.main.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NewEventDto {
     @NotBlank
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 120)
     private String title;
 
     @NotBlank
@@ -33,18 +34,18 @@ public class NewEventDto {
     private Long category;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(message = "Дата события должна быть не ранее чем через два часа от текущего момента")
     private LocalDateTime eventDate;
 
     @NotNull
     private LocationDto location;
 
-    @NotNull
     private Boolean paid;
 
     @PositiveOrZero(message = "Лимит участников не может быть отрицательным")
     private Integer participantLimit;
 
-    @NotNull
     private Boolean requestModeration;
 }

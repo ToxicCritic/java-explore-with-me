@@ -1,10 +1,10 @@
 package ru.practicum.explorewithme.main.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UpdateEventAdminRequest {
 
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 120)
     private String title;
 
     @Size(min = 20, max = 2000)
@@ -21,9 +21,11 @@ public class UpdateEventAdminRequest {
     @Size(min = 20, max = 7000)
     private String description;
 
-    /** id новой категории */
     private Long category;
 
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss")
     @Future(message = "Дата события должна быть в будущем")
     private LocalDateTime eventDate;
 
@@ -36,7 +38,6 @@ public class UpdateEventAdminRequest {
 
     private Boolean requestModeration;
 
-    /** действие администратора над состоянием события */
     private StateAction stateAction;
 
     public enum StateAction {

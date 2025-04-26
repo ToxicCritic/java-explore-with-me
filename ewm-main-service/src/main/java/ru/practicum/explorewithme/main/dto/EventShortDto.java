@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.main.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -25,7 +26,12 @@ public class EventShortDto {
     private Boolean paid;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
+
+    @NotNull
+    private UserDto initiator;
 
     @NotNull
     @Min(0)

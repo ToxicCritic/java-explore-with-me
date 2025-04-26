@@ -1,7 +1,10 @@
 package ru.practicum.explorewithme.main.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import jakarta.validation.constraints.*;
+import ru.practicum.explorewithme.main.model.EventState;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -24,10 +27,11 @@ public class EventFullDto {
     @NotNull
     private CategoryDto category;
 
-    @NotNull
     private Boolean paid;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
     @NotNull
@@ -41,12 +45,13 @@ public class EventFullDto {
     @NotNull
     private LocationDto location;
 
-    @NotNull
     @Min(0)
     private Integer participantLimit;
 
-    @NotNull
     private Boolean requestModeration;
+
+    @NotNull
+    private EventState state;
 
     @NotNull
     @Min(0)
