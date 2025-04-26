@@ -1,5 +1,7 @@
 package ru.practicum.explorewithme.main.model;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -20,12 +22,13 @@ public class Compilation {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Size(max = 50)
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @NotNull
-    @Column(nullable = false)
-    private Boolean pinned;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean pinned = false;
 
     @ManyToMany
     @JoinTable(

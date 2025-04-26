@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.main.model;
 
 import jakarta.persistence.Entity;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -24,6 +25,7 @@ public class User {
 
     @NotBlank
     @Email
+    @Size(min = 6)
     @Column(nullable = false, unique = true)
     private String email;
 }

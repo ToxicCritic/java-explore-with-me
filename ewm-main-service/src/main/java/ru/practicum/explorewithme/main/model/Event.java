@@ -20,14 +20,17 @@ public class Event {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Size(min = 3, max = 120)
+    @Column(nullable = false, length = 120)
     private String title;
 
     @NotBlank
-    @Column(nullable = false)
+    @Size(min = 20, max = 2000)
+    @Column(nullable = false, length = 2000)
     private String annotation;
 
     @NotBlank
+    @Size(min = 20, max = 7000)
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -36,11 +39,12 @@ public class Event {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @NotNull
-    @Column(nullable = false)
-    private Boolean paid;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean paid = false;
 
     @NotNull
+    @FutureOrPresent
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
@@ -59,14 +63,19 @@ public class Event {
     @Embedded
     private Location location;
 
-    @NotNull
     @Min(0)
-    @Column(name = "participant_limit", nullable = false)
-    private Integer participantLimit;
+    @Column(name = "participant_limit",
+            nullable = false,
+            columnDefinition = "integer default 0")
+    @Builder.Default
+    private Integer participantLimit = 0;
 
-    @NotNull
-    @Column(name = "request_moderation", nullable = false)
-    private Boolean requestModeration;
+
+    @Column(name = "request_moderation",
+            nullable = false,
+            columnDefinition = "boolean default false")
+    @Builder.Default
+    private Boolean requestModeration = false;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -74,13 +83,18 @@ public class Event {
     private EventState state;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ParticipationRequest> requests = new ArrayList<>();
 
     @Transient
     private Long views;
 
     public int getConfirmedRequestsCount() {
+        if (requests == null) {
+            return 0;
+        }
         return (int) requests.stream()
+                .filter(r -> !r.getRequester().getId().equals(initiator.getId()))
                 .filter(r -> r.getStatus() == RequestStatus.CONFIRMED)
                 .count();
     }
