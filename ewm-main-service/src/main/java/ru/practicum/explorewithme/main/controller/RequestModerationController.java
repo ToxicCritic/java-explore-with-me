@@ -2,7 +2,9 @@ package ru.practicum.explorewithme.main.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.main.dto.EventRequestStatusUpdateResult;
 import ru.practicum.explorewithme.main.dto.ParticipationRequestDto;
+import ru.practicum.explorewithme.main.dto.UpdateEventRequestStatusRequest;
 import ru.practicum.explorewithme.main.service.RequestService;
 
 import java.util.List;
@@ -17,6 +19,13 @@ public class RequestModerationController {
     public List<ParticipationRequestDto> find(@PathVariable Long userId,
                                               @PathVariable Long eventId) {
         return service.findForEventOwner(userId, eventId);
+    }
+
+    @PatchMapping
+    public EventRequestStatusUpdateResult updateStatus(@PathVariable Long userId,
+                                                       @PathVariable Long eventId,
+                                                       @RequestBody UpdateEventRequestStatusRequest body) {
+        return service.updateStatus(userId, eventId, body);
     }
 
     @PatchMapping("/{reqId}/confirm")
