@@ -3,6 +3,7 @@ package ru.practicum.explorewithme.main.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.main.dto.EventFullDto;
 import ru.practicum.explorewithme.main.dto.EventShortDto;
@@ -18,13 +19,16 @@ public class PublicEventController {
 
     private final EventService eventService;
 
-    // GET /events
     @GetMapping
     public List<EventShortDto> searchEvents(@RequestParam(required = false) String text,
                                             @RequestParam(required = false) List<Long> categories,
                                             @RequestParam(required = false) Boolean paid,
-                                            @RequestParam(required = false) LocalDateTime rangeStart,
-                                            @RequestParam(required = false) LocalDateTime rangeEnd,
+                                            @RequestParam(required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                            LocalDateTime rangeStart,
+                                            @RequestParam(required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                            LocalDateTime rangeEnd,
                                             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
                                             @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                             @RequestParam(defaultValue = "0")     @Min(0) Integer from,
@@ -34,7 +38,6 @@ public class PublicEventController {
                 onlyAvailable, sort, from, size, request);
     }
 
-    // GET /events/{id}
     @GetMapping("/{id}")
     public EventFullDto getPublished(@PathVariable Long id,
                                      HttpServletRequest request) {

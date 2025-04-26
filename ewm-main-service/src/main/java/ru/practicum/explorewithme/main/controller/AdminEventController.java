@@ -2,6 +2,8 @@ package ru.practicum.explorewithme.main.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.main.dto.EventFullDto;
 import ru.practicum.explorewithme.main.dto.UpdateEventAdminRequest;
@@ -18,15 +20,22 @@ public class AdminEventController {
     private final EventService eventService;
 
     @GetMapping
-    public List<EventFullDto> search(@RequestParam(required = false) List<Long> users,
-                                     @RequestParam(required = false) List<String> states,
-                                     @RequestParam(required = false) List<Long> categories,
-                                     @RequestParam(required = false) LocalDateTime rangeStart,
-                                     @RequestParam(required = false) LocalDateTime rangeEnd,
-                                     @RequestParam(defaultValue = "0")  @Min(0) Integer from,
-                                     @RequestParam(defaultValue = "10") @Min(1) Integer size) {
-        return eventService.searchAdmin(users, states, categories,
-                rangeStart, rangeEnd, from, size);
+    public ResponseEntity<List<EventFullDto>> search(@RequestParam(required = false) List<Long> users,
+                                                     @RequestParam(required = false) List<String> states,
+                                                     @RequestParam(required = false) List<Long> categories,
+                                                     @RequestParam(required = false)
+                                                     // вот бы форматтер написать на это все
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                     LocalDateTime rangeStart,
+                                                     @RequestParam(required = false)
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                     LocalDateTime rangeEnd,
+                                                     @RequestParam(defaultValue = "0")  @Min(0) Integer from,
+                                                     @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+        List<EventFullDto> result = eventService.searchAdmin(
+                users, states, categories, rangeStart, rangeEnd, from, size);
+
+        return ResponseEntity.ok(result);
     }
 
     @PatchMapping("/{eventId}")
