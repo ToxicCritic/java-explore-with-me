@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.explorewithme.main.model.Event;
-import ru.practicum.explorewithme.main.model.EventState;
+import ru.practicum.explorewithme.main.model.event.Event;
+import ru.practicum.explorewithme.main.model.event.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;

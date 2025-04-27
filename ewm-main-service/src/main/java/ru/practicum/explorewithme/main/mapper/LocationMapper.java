@@ -1,8 +1,8 @@
 package ru.practicum.explorewithme.main.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.explorewithme.main.dto.LocationDto;
-import ru.practicum.explorewithme.main.model.Location;
+import ru.practicum.explorewithme.main.dto.location.LocationDto;
+import ru.practicum.explorewithme.main.model.location.Location;
 
 @Component
 public class LocationMapper {

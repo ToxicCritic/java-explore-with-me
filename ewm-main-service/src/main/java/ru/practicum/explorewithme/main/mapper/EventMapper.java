@@ -2,9 +2,9 @@ package ru.practicum.explorewithme.main.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.explorewithme.main.dto.*;
-import ru.practicum.explorewithme.main.model.Event;
-import ru.practicum.explorewithme.main.model.EventState;
+import ru.practicum.explorewithme.main.dto.event.*;
+import ru.practicum.explorewithme.main.model.event.Event;
+import ru.practicum.explorewithme.main.model.event.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;

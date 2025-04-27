@@ -1,9 +1,9 @@
 package ru.practicum.explorewithme.main.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.explorewithme.main.dto.NewUserRequest;
-import ru.practicum.explorewithme.main.dto.UserDto;
-import ru.practicum.explorewithme.main.model.User;
+import ru.practicum.explorewithme.main.dto.user.NewUserDto;
+import ru.practicum.explorewithme.main.dto.user.UserDto;
+import ru.practicum.explorewithme.main.model.user.User;
 
 @Component
 public class UserMapper {
@@ -19,7 +19,7 @@ public class UserMapper {
                 .build();
     }
 
-    public User fromDto(NewUserRequest dto) {
+    public User fromDto(NewUserDto dto) {
         if (dto == null) return null;
 
         return User.builder()

@@ -2,9 +2,11 @@ package ru.practicum.explorewithme.main.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.explorewithme.main.dto.*;
-import ru.practicum.explorewithme.main.model.Compilation;
-import ru.practicum.explorewithme.main.model.Event;
+import ru.practicum.explorewithme.main.dto.compilation.CompilationDto;
+import ru.practicum.explorewithme.main.dto.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.main.dto.compilation.UpdateCompilationRequest;
+import ru.practicum.explorewithme.main.model.compilation.Compilation;
+import ru.practicum.explorewithme.main.model.event.Event;
 
 import java.util.List;
 import java.util.function.Function;

@@ -1,9 +1,9 @@
 package ru.practicum.explorewithme.main.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.explorewithme.main.dto.CategoryDto;
-import ru.practicum.explorewithme.main.dto.NewCategoryDto;
-import ru.practicum.explorewithme.main.model.Category;
+import ru.practicum.explorewithme.main.dto.category.CategoryDto;
+import ru.practicum.explorewithme.main.dto.category.NewCategoryDto;
+import ru.practicum.explorewithme.main.model.category.Category;
 
 @Component
 public class CategoryMapper {

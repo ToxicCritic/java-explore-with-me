@@ -2,8 +2,8 @@ package ru.practicum.explorewithme.main.repository;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.explorewithme.main.model.ParticipationRequest;
-import ru.practicum.explorewithme.main.model.RequestStatus;
+import ru.practicum.explorewithme.main.model.request.ParticipationRequest;
+import ru.practicum.explorewithme.main.model.request.RequestStatus;
 
 import java.util.List;
 import java.util.Optional;
