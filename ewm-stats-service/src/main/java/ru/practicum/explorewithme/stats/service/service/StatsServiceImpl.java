@@ -1,8 +1,10 @@
 package ru.practicum.explorewithme.stats.service.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.explorewithme.stats.common.dto.EndpointHit;
 import ru.practicum.explorewithme.stats.common.dto.ViewStats;
 import ru.practicum.explorewithme.stats.service.entity.EndpointHitEntity;
@@ -34,6 +36,13 @@ public class StatsServiceImpl implements StatsService {
                                     LocalDateTime end,
                                     List<String> uris,
                                     boolean unique) {
+
+        if (start.isAfter(end)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "rangeStart must be before rangeEnd"
+            );
+        }
 
         boolean noFilter = (uris == null || uris.isEmpty());
 
