@@ -93,7 +93,7 @@ public class EventMapper {
         if (dto.getPaid()             != null) e.setPaid(dto.getPaid());
         if (dto.getEventDate()        != null) e.setEventDate(dto.getEventDate());
         if (dto.getParticipantLimit() != null) e.setParticipantLimit(dto.getParticipantLimit());
-        if (dto.getRequestModeration()!= null) e.setRequestModeration(dto.getRequestModeration());
+        if (dto.getRequestModeration() != null) e.setRequestModeration(dto.getRequestModeration());
 
         if (dto.getLocation() != null) {
             e.setLocation(locationMapper.fromDto(dto.getLocation()));

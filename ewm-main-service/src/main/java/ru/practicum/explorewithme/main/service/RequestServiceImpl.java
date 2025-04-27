@@ -40,18 +40,22 @@ public class RequestServiceImpl implements RequestService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException("user"));
 
-        if (event.getInitiator().getId().equals(userId))
+        if (event.getInitiator().getId().equals(userId)) {
             throw new ConflictException("initiator cannot request");
+        }
 
-        if (event.getState() != EventState.PUBLISHED)
+        if (event.getState() != EventState.PUBLISHED) {
             throw new ConflictException("event not published");
+        }
 
         if (event.getParticipantLimit() != 0 &&
-            event.getConfirmedRequestsCount() >= event.getParticipantLimit())
+            event.getConfirmedRequestsCount() >= event.getParticipantLimit()) {
             throw new ConflictException("participant limit reached");
+        }
 
-        if (repo.existsByRequesterIdAndEventId(userId, eventId))
+        if (repo.existsByRequesterIdAndEventId(userId, eventId)) {
             throw new ConflictException("duplicate request");
+        }
 
         boolean unlimited        = event.getParticipantLimit() == 0;
         boolean needsModeration  = event.getRequestModeration();
@@ -91,17 +95,20 @@ public class RequestServiceImpl implements RequestService {
         ParticipationRequest pr = repo.findById(reqId)
                 .orElseThrow(() -> new NotFoundException("request"));
 
-        if (!pr.getEvent().getId().equals(event.getId()))
+        if (!pr.getEvent().getId().equals(event.getId())) {
             throw new ConflictException("request not for this event");
+        }
 
-        if (pr.getStatus() != RequestStatus.PENDING)
+        if (pr.getStatus() != RequestStatus.PENDING) {
             throw new ConflictException("already handled");
+        }
 
         int limit       = event.getParticipantLimit() == null ? 0 : event.getParticipantLimit();
         int confirmedSoFar = event.getConfirmedRequestsCount();
 
-        if (limit != 0 && confirmedSoFar >= limit)
+        if (limit != 0 && confirmedSoFar >= limit) {
             throw new ConflictException("limit reached");
+        }
 
         pr.setStatus(RequestStatus.CONFIRMED);
         repo.save(pr);
@@ -123,8 +130,9 @@ public class RequestServiceImpl implements RequestService {
         ParticipationRequest pr = repo.findById(reqId)
                 .orElseThrow(() -> new NotFoundException("request"));
 
-        if (pr.getStatus() != RequestStatus.PENDING)
+        if (pr.getStatus() != RequestStatus.PENDING) {
             throw new ConflictException("already handled");
+        }
 
         pr.setStatus(RequestStatus.REJECTED);
         return mapper.toDto(pr);
@@ -139,13 +147,15 @@ public class RequestServiceImpl implements RequestService {
         Event event = getEventOwned(userId, eventId);
 
         List<ParticipationRequest> requests = repo.findAllById(body.getRequestIds());
-        if (requests.size() != body.getRequestIds().size())
+        if (requests.size() != body.getRequestIds().size()) {
             throw new NotFoundException("some requests not found");
+        }
 
         requests.stream()
                 .filter(r -> r.getStatus() != RequestStatus.PENDING)
                 .findAny()
-                .ifPresent(r -> { throw new ConflictException("non-pending request in list"); });
+                .ifPresent(r -> {
+                    throw new ConflictException("non-pending request in list"); });
 
         int limit           = event.getParticipantLimit() == null ? 0 : event.getParticipantLimit();
         int confirmedSoFar  = event.getConfirmedRequestsCount();

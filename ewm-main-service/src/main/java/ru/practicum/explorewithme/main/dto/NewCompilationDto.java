@@ -16,6 +16,6 @@ public class NewCompilationDto {
     private String title;
 
     private List<Long> events;
-    
+
     private Boolean pinned;
 }

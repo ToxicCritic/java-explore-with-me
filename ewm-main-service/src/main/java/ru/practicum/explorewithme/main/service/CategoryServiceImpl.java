@@ -56,8 +56,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category cat = catRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("category"));
 
-        if (eventRepo.existsByCategoryId(cat.getId()))
+        if (eventRepo.existsByCategoryId(cat.getId())) {
             throw new ConflictException("Category is linked to events");
+        }
 
         catRepo.delete(cat);
     }

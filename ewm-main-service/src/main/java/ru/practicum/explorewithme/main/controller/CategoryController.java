@@ -25,11 +25,15 @@ public class CategoryController {
     }
 
     @GetMapping("/categories/{id}")
-    public CategoryDto find(@PathVariable Long id) { return service.find(id); }
+    public CategoryDto find(@PathVariable Long id) {
+        return service.find(id);
+    }
 
     @PostMapping("/admin/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto add(@RequestBody @Valid NewCategoryDto dto) { return service.add(dto); }
+    public CategoryDto add(@RequestBody @Valid NewCategoryDto dto) {
+        return service.add(dto);
+    }
 
     @PatchMapping("/admin/categories/{id}")
     public CategoryDto edit(@PathVariable Long id, @RequestBody @Valid NewCategoryDto dto) {
@@ -38,5 +42,7 @@ public class CategoryController {
 
     @DeleteMapping("/admin/categories/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) { service.delete(id); }
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
 }

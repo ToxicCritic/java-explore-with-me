@@ -26,9 +26,13 @@ public class UserAdminController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto add(@Valid @RequestBody NewUserRequest dto) { return service.add(dto); }
+    public UserDto add(@Valid @RequestBody NewUserRequest dto) {
+        return service.add(dto);
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) { service.delete(id); }
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
 }

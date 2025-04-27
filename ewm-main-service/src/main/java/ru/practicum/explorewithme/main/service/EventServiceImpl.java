@@ -205,8 +205,9 @@ public class EventServiceImpl implements EventService {
 
         LocalDateTime start = rangeStart != null ? rangeStart : FAR_PAST;
         LocalDateTime end   = rangeEnd   != null ? rangeEnd   : FAR_FUTURE;
-        if (start.isAfter(end))
+        if (start.isAfter(end)) {
             throw new ConflictException("rangeStart must be before rangeEnd");
+        }
 
         List<EventState> stateEnums = states == null || states.isEmpty()
                 ? null
