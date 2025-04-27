@@ -8,6 +8,7 @@ import ru.practicum.explorewithme.main.dto.*;
 import ru.practicum.explorewithme.main.exception.NotFoundException;
 import ru.practicum.explorewithme.main.mapper.CompilationMapper;
 import ru.practicum.explorewithme.main.model.Compilation;
+import ru.practicum.explorewithme.main.model.Event;
 import ru.practicum.explorewithme.main.repository.CompilationRepository;
 import ru.practicum.explorewithme.main.repository.EventRepository;
 
@@ -43,8 +44,14 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     @Override
     public CompilationDto add(NewCompilationDto dto) {
-        Compilation cmp = mapper.fromDto(dto, eventRepo.findAllById(dto.getEvents()));
-        return mapper.toDto(repo.save(cmp));
+        List<Long> ids = dto.getEvents();
+        List<Event> events = (ids == null || ids.isEmpty())
+                ? List.of()
+                : eventRepo.findAllById(ids);
+
+        Compilation cmp = mapper.fromDto(dto, events);
+        cmp = repo.saveAndFlush(cmp);
+        return mapper.toDto(cmp);
     }
 
     @Transactional
@@ -52,7 +59,13 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto edit(Long id, UpdateCompilationRequest dto) {
         Compilation cmp = repo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Compilation not found"));
-        mapper.updateFromDto(dto, cmp, eventRepo::findAllById);
+        mapper.updateFromDto(
+                dto,
+                cmp,
+                ids -> ids == null
+                        ? List.of()
+                        : eventRepo.findAllById(ids)
+        );
         return mapper.toDto(cmp);
     }
 
