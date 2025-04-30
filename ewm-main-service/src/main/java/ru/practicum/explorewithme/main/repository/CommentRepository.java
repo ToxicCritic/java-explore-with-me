@@ -7,8 +7,8 @@ import ru.practicum.explorewithme.main.model.comment.Comment;
 import ru.practicum.explorewithme.main.model.comment.CommentStatus;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    
+
     Page<Comment> findAllByEventIdAndStatus(Long eventId, CommentStatus status, Pageable pageable);
-    
+
     Page<Comment> findAllByAuthorId(Long authorId, Pageable pageable);
 }
