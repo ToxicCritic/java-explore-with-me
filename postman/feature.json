@@ -1,0 +1,525 @@
+{
+	"info": {
+		"_postman_id": "3f59047b-20a0-450c-bb81-89cb2e276cf3",
+		"name": "feature",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40398358"
+	},
+	"item": [
+		{
+			"name": "add comment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const baseUrl = pm.variables.get(\"baseUrl\");",
+							"",
+							"pm.sendRequest({",
+							"    url: `${baseUrl}/admin/users`,",
+							"    method: \"POST\",",
+							"    header: { \"Content-Type\": \"application/json\" },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            name: `User ${Date.now()}`,",
+							"            email: `u${Date.now()}@test.com`",
+							"        })",
+							"    }",
+							"}, (err1, res1) => {",
+							"    if (err1) { console.error(err1); return; }",
+							"    const user = res1.json();",
+							"    pm.collectionVariables.set(\"userId\", user.id);",
+							"",
+							"    pm.sendRequest({",
+							"        url: `${baseUrl}/admin/categories`,",
+							"        method: \"POST\",",
+							"        header: { \"Content-Type\": \"application/json\" },",
+							"        body: {",
+							"            mode: \"raw\",",
+							"            raw: JSON.stringify({ name: `Cat ${Date.now()}` })",
+							"        }",
+							"    }, (err2, res2) => {",
+							"        if (err2) { console.error(err2); return; }",
+							"        const cat = res2.json();",
+							"        pm.collectionVariables.set(\"categoryId\", cat.id);",
+							"",
+							"        pm.sendRequest({",
+							"            url: `${baseUrl}/users/${user.id}/events`,",
+							"            method: \"POST\",",
+							"            header: { \"Content-Type\": \"application/json\" },",
+							"            body: {",
+							"                mode: \"raw\",",
+							"                raw: JSON.stringify({",
+							"                    title: \"Заголовок события\",",
+							"                    annotation: \"Минимально 20 символов аннотации\",",
+							"                    description: \"Минимально 20 символов описания события\",",
+							"                    category: cat.id,",
+							"                    eventDate: \"2099-12-31 12:00:00\",",
+							"                    location: { lat: 0, lon: 0 },",
+							"                    paid: false,",
+							"                    participantLimit: 0,",
+							"                    requestModeration: false",
+							"                })",
+							"            }",
+							"        }, (err3, res3) => {",
+							"            if (err3) { console.error(err3); return; }",
+							"            const evt = res3.json();",
+							"            pm.collectionVariables.set(\"eventId\", evt.id);",
+							"",
+							"            pm.sendRequest({",
+							"                url: `${baseUrl}/admin/events/${evt.id}`,",
+							"                method: \"PATCH\",",
+							"                header: { \"Content-Type\": \"application/json\" },",
+							"                body: {",
+							"                    mode: \"raw\",",
+							"                    raw: JSON.stringify({ stateAction: \"PUBLISH_EVENT\" })",
+							"                }",
+							"            }, (err4, res4) => {",
+							"                if (err4) {",
+							"                    console.error(\"Не удалось опубликовать событие:\", err4);",
+							"                }",
+							"            });",
+							"        });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 201 Created\", () => {",
+							"    pm.response.to.have.status(201);",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"const comment = pm.response.json();",
+							"pm.collectionVariables.set(\"commentId\", comment.id);",
+							"",
+							"const reqBody = JSON.parse(pm.request.body.raw);",
+							"",
+							"pm.test(\"CommentDto содержит все поля и правильные значения\", () => {",
+							"    pm.expect(comment).to.include.keys(",
+							"        \"id\",",
+							"        \"eventId\",",
+							"        \"authorId\",",
+							"        \"authorName\",",
+							"        \"text\",",
+							"        \"createdOn\",",
+							"        \"status\"",
+							"    );",
+							"",
+							"    pm.expect(comment.eventId).to.eql(+pm.collectionVariables.get(\"eventId\"));",
+							"    pm.expect(comment.authorId).to.eql(+pm.collectionVariables.get(\"userId\"));",
+							"",
+							"    pm.expect(comment.authorName).to.be.a(\"string\").and.not.be.empty;",
+							"",
+							"    pm.expect(comment.text).to.eql(reqBody.text);",
+							"",
+							"    pm.expect(() => new Date(comment.createdOn)).to.not.throw();",
+							"    pm.expect(new Date(comment.createdOn).toString()).to.not.eql(\"Invalid Date\");",
+							"",
+							"    pm.expect(comment.status).to.eql(\"PENDING\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"text\": \"Это тестовый комментарий\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/{{userId}}/events/{{eventId}}/comments",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"{{userId}}",
+						"events",
+						"{{eventId}}",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "comments by event",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const baseUrl = pm.variables.get(\"baseUrl\");",
+							"",
+							"pm.sendRequest({",
+							"    url: `${baseUrl}/admin/users`,",
+							"    method: \"POST\",",
+							"    header: { \"Content-Type\": \"application/json\" },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            name: `User ${Date.now()}`,",
+							"            email: `u${Date.now()}@test.com`",
+							"        })",
+							"    }",
+							"}, (err1, res1) => {",
+							"    if (err1) { console.error(err1); return; }",
+							"    const user = res1.json();",
+							"    pm.collectionVariables.set(\"userId\", user.id);",
+							"",
+							"    pm.sendRequest({",
+							"        url: `${baseUrl}/admin/categories`,",
+							"        method: \"POST\",",
+							"        header: { \"Content-Type\": \"application/json\" },",
+							"        body: { mode: \"raw\", raw: JSON.stringify({ name: `Cat ${Date.now()}` }) }",
+							"    }, (err2, res2) => {",
+							"        if (err2) { console.error(err2); return; }",
+							"        const cat = res2.json();",
+							"        pm.collectionVariables.set(\"categoryId\", cat.id);",
+							"",
+							"        pm.sendRequest({",
+							"            url: `${baseUrl}/users/${user.id}/events`,",
+							"            method: \"POST\",",
+							"            header: { \"Content-Type\": \"application/json\" },",
+							"            body: {",
+							"                mode: \"raw\",",
+							"                raw: JSON.stringify({",
+							"                    title: \"Заголовок события\",",
+							"                    annotation: \"Минимально 20 символов аннотации\",",
+							"                    description: \"Минимально 20 символов описания события\",",
+							"                    category: cat.id,",
+							"                    eventDate: \"2099-12-31 12:00:00\",",
+							"                    location: { lat: 0, lon: 0 },",
+							"                    paid: false,",
+							"                    participantLimit: 0,",
+							"                    requestModeration: false",
+							"                })",
+							"            }",
+							"        }, (err3, res3) => {",
+							"            if (err3) { console.error(err3); return; }",
+							"            const evt = res3.json();",
+							"            pm.collectionVariables.set(\"eventId\", evt.id);",
+							"",
+							"            pm.sendRequest({",
+							"                url: `${baseUrl}/admin/events/${evt.id}`,",
+							"                method: \"PATCH\",",
+							"                header: { \"Content-Type\": \"application/json\" },",
+							"                body: { mode: \"raw\", raw: JSON.stringify({ stateAction: \"PUBLISH_EVENT\" }) }",
+							"            }, (err4) => {",
+							"                if (err4) { console.error(\"Не удалось опубликовать событие:\", err4); }",
+							"                ",
+							"                pm.sendRequest({",
+							"                    url: `${baseUrl}/users/${user.id}/events/${evt.id}/comments`,",
+							"                    method: \"POST\",",
+							"                    header: { \"Content-Type\": \"application/json\" },",
+							"                    body: { mode: \"raw\", raw: JSON.stringify({ text: \"Первый тестовый комментарий\" }) }",
+							"                }, (e5, r5) => {",
+							"                    const c1 = r5.json();",
+							"                    pm.collectionVariables.set(\"commentId1\", c1.id);",
+							"                    pm.sendRequest({",
+							"                        url: `${baseUrl}/admin/comments/${c1.id}?status=APPROVED`,",
+							"                        method: \"PATCH\"",
+							"                    });",
+							"",
+							"                    pm.sendRequest({",
+							"                        url: `${baseUrl}/users/${user.id}/events/${evt.id}/comments`,",
+							"                        method: \"POST\",",
+							"                        header: { \"Content-Type\": \"application/json\" },",
+							"                        body: { mode: \"raw\", raw: JSON.stringify({ text: \"Второй тестовый комментарий\" }) }",
+							"                    }, (e6, r6) => {",
+							"                        const c2 = r6.json();",
+							"                        pm.collectionVariables.set(\"commentId2\", c2.id);",
+							"                        pm.sendRequest({",
+							"                            url: `${baseUrl}/admin/comments/${c2.id}?status=APPROVED`,",
+							"                            method: \"PATCH\"",
+							"                        });",
+							"                    });",
+							"                });",
+							"            });",
+							"        });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK и возвращается массив\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.be.json;",
+							"    pm.expect(pm.response.json()).to.be.an(\"array\");",
+							"});",
+							"",
+							"const list = pm.response.json();",
+							"const ids = list.map(c => c.id);",
+							"const expected1 = +pm.collectionVariables.get(\"commentId1\");",
+							"const expected2 = +pm.collectionVariables.get(\"commentId2\");",
+							"",
+							"pm.test(\"Массив содержит оба созданных комментария\", () => {",
+							"    pm.expect(ids).to.include.members([ expected1, expected2 ]);",
+							"});",
+							"",
+							"pm.test(\"Все полученные комментарии — со статусом APPROVED\", () => {",
+							"    list.forEach(c => {",
+							"        pm.expect(c).to.have.property(\"status\", \"APPROVED\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/events/{{eventId}}/comments?from=0&size=10",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"events",
+						"{{eventId}}",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update comment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const baseUrl = pm.variables.get(\"baseUrl\");",
+							"",
+							"pm.sendRequest({",
+							"    url: `${baseUrl}/admin/users`,",
+							"    method: \"POST\",",
+							"    header: { \"Content-Type\": \"application/json\" },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            name: `User ${Date.now()}`,",
+							"            email: `u${Date.now()}@test.com`",
+							"        })",
+							"    }",
+							"}, (err1, res1) => {",
+							"    if (err1) { console.error(err1); return; }",
+							"    const user = res1.json();",
+							"    pm.collectionVariables.set(\"userId\", user.id);",
+							"",
+							"    pm.sendRequest({",
+							"        url: `${baseUrl}/admin/categories`,",
+							"        method: \"POST\",",
+							"        header: { \"Content-Type\": \"application/json\" },",
+							"        body: {",
+							"            mode: \"raw\",",
+							"            raw: JSON.stringify({ name: `Cat ${Date.now()}` })",
+							"        }",
+							"    }, (err2, res2) => {",
+							"        if (err2) { console.error(err2); return; }",
+							"        const cat = res2.json();",
+							"        pm.collectionVariables.set(\"categoryId\", cat.id);",
+							"",
+							"        pm.sendRequest({",
+							"            url: `${baseUrl}/users/${user.id}/events`,",
+							"            method: \"POST\",",
+							"            header: { \"Content-Type\": \"application/json\" },",
+							"            body: {",
+							"                mode: \"raw\",",
+							"                raw: JSON.stringify({",
+							"                    title: \"Заголовок события\",",
+							"                    annotation: \"Минимально 20 символов аннотации\",",
+							"                    description: \"Минимально 20 символов описания события\",",
+							"                    category: cat.id,",
+							"                    eventDate: \"2099-12-31 12:00:00\",",
+							"                    location: { lat: 0, lon: 0 },",
+							"                    paid: false,",
+							"                    participantLimit: 0,",
+							"                    requestModeration: false",
+							"                })",
+							"            }",
+							"        }, (err3, res3) => {",
+							"            if (err3) { console.error(err3); return; }",
+							"            const evt = res3.json();",
+							"            pm.collectionVariables.set(\"eventId\", evt.id);",
+							"",
+							"            pm.sendRequest({",
+							"                url: `${baseUrl}/admin/events/${evt.id}`,",
+							"                method: \"PATCH\",",
+							"                header: { \"Content-Type\": \"application/json\" },",
+							"                body: {",
+							"                    mode: \"raw\",",
+							"                    raw: JSON.stringify({ stateAction: \"PUBLISH_EVENT\" })",
+							"                }",
+							"            }, (err4, res4) => {",
+							"                if (err4) { console.error(err4); return; }",
+							"",
+							"                const text = `Тестовый комментарий ${Date.now()}`;",
+							"                pm.collectionVariables.set(\"newCommentText\", text);",
+							"",
+							"                pm.sendRequest({",
+							"                    url: `${baseUrl}/users/${user.id}/events/${evt.id}/comments`,",
+							"                    method: \"POST\",",
+							"                    header: { \"Content-Type\": \"application/json\" },",
+							"                    body: {",
+							"                        mode: \"raw\",",
+							"                        raw: JSON.stringify({ text })",
+							"                    }",
+							"                }, (err5, res5) => {",
+							"                    if (err5) { console.error(err5); return; }",
+							"                    const com = res5.json();",
+							"                    pm.collectionVariables.set(\"commentId\", com.id);",
+							"                });",
+							"            });",
+							"        });",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK и JSON\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"const updated = pm.response.json();",
+							"",
+							"pm.test(\"Комментарий переведен в APPROVED\", () => {",
+							"    pm.expect(updated.id).to.eql(+pm.collectionVariables.get(\"commentId\"));",
+							"    pm.expect(updated.status).to.eql(\"APPROVED\");",
+							"    pm.expect(updated.eventId).to.eql(+pm.collectionVariables.get(\"eventId\"));",
+							"    pm.expect(updated.authorId).to.eql(+pm.collectionVariables.get(\"userId\"));",
+							"    pm.expect(updated.text).to.eql(pm.collectionVariables.get(\"newCommentText\"));",
+							"    pm.expect(updated).to.have.property(\"authorName\");",
+							"    pm.expect(updated).to.have.property(\"createdOn\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/admin/comments/{{commentId}}?status=APPROVED",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"comments",
+						"{{commentId}}"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "APPROVED"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "categoryId",
+			"value": ""
+		},
+		{
+			"key": "eventId",
+			"value": ""
+		},
+		{
+			"key": "commentId",
+			"value": ""
+		},
+		{
+			"key": "newCommentText",
+			"value": ""
+		},
+		{
+			"key": "commentId1",
+			"value": ""
+		},
+		{
+			"key": "commentId2",
+			"value": ""
+		}
+	]
+}
