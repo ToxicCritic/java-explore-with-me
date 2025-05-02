@@ -1,7 +1,5 @@
 # ExploreWithMe
 
-[Ссылка на ПР feature_comments](https://github.com/ToxicCritic/java-explore-with-me/pull/4)
-
 Приложение «Explore With Me» — это платформа для поиска, создания и управления событиями.
 
 В этом репозитории два сервиса:
